@@ -60,6 +60,10 @@ android/build/
 android/app/build/
 android/.gradle/
 
+# --- Claude Code ---
+.claude/
+skills/
+
 # --- IDE ---
 .vscode/
 *.swp
