@@ -1,16 +1,24 @@
-"""ClipMind backend entrypoint.
-
-Phase 0: skeleton with /health and /version. Real routes land in Phase 2.
-"""
+"""ClipMind backend entrypoint."""
 from __future__ import annotations
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+from app.api.videos import router as videos_router
 
 app = FastAPI(
     title="ClipMind API",
-    version="0.1.0",
+    version="0.2.0",
     description="Personal video intelligence — backend.",
+)
+
+# Permissive in dev; lock down in Phase 8.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -21,10 +29,12 @@ class Health(BaseModel):
 
 @app.get("/health", response_model=Health, tags=["meta"])
 async def health() -> Health:
-    """Liveness probe. Does not check downstream dependencies; that is /ready."""
     return Health(status="ok", version=app.version)
 
 
 @app.get("/", tags=["meta"])
 async def root() -> dict[str, str]:
     return {"name": "clipmind-api", "docs": "/docs"}
+
+
+app.include_router(videos_router)
